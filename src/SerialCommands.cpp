@@ -135,14 +135,14 @@ SERIAL_COMMANDS_ERRORS SerialCommands::ReadSerial()
 						Serial.print("Matched #");
 						Serial.println(cx);
 #endif
-						cmd->function(this);
+						cmd->function(this, cmd->data);
 						matched = true;
 						break;
 					}
 				}
 				if (!matched && default_handler_ != NULL)
 				{
-					(*default_handler_)(this, command);
+					(*default_handler_)(this, command, default_handler_data);
 				}
 			}
 
@@ -176,7 +176,7 @@ bool SerialCommands::CheckOneKeyCmd()
 			Serial.print("Matched #");
 			Serial.println(cx);
 #endif
-			cmd->function(this);
+			cmd->function(this, cmd->data);
 			ClearBuffer();
 			return true;
 		}
@@ -201,9 +201,10 @@ void SerialCommands::DetachSerial()
 	serial_ = NULL;
 }
 
-void SerialCommands::SetDefaultHandler(void(*function)(SerialCommands*, const char*))
+void SerialCommands::SetDefaultHandler(void(*function)(SerialCommands*, const char*, void*), void* dt)
 {
 	default_handler_ = function;
+	default_handler_data = dt;
 }
 
 void SerialCommands::ClearBuffer()

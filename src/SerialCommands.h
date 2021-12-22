@@ -24,18 +24,20 @@ typedef class SerialCommand SerialCommand;
 class SerialCommand
 {
 public:
-	SerialCommand(const char* cmd, void(*func)(SerialCommands*), bool one_k=false)
+	SerialCommand(const char* cmd, void(*func)(SerialCommands*, void*), bool one_k=false, void* dt = nullptr)
 		: command(cmd),
 		function(func),
 		next(NULL),
-		one_key(one_k)
+		one_key(one_k),
+		data(dt)
 	{
 	}
 
 	const char* command;
-	void(*function)(SerialCommands*);
+	void(*function)(SerialCommands*, void*);
 	SerialCommand* next;
 	bool one_key;
+    void* data;
 };
 
 class SerialCommands
@@ -94,7 +96,7 @@ public:
 	 * \brief Sets a default handler can be used for a catch all or unrecognized commands
 	 * \param function 
 	 */
-	void SetDefaultHandler(void(*function)(SerialCommands*, const char*));
+	void SetDefaultHandler(void(*function)(SerialCommands*, const char*, void*), void* dt = nullptr);
 	
 	/**
 	 * \brief Clears the buffer, and resets the indexes.
@@ -113,7 +115,8 @@ private:
 	int16_t buffer_len_;
 	const char* term_;
 	const char* delim_;
-	void(*default_handler_)(SerialCommands*, const char*);
+	void(*default_handler_)(SerialCommands*, const char*, void*);
+	void* default_handler_data;
 	int16_t buffer_pos_;
 	char* last_token_;
 	int8_t term_pos_;
